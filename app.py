@@ -82,8 +82,8 @@ with tab1:
         "Medios de transporte insuficientes, inadecuados, inaccesibles, etc.",
         "Cuando por su condición, alguna o algún NNAJ asiste a un Centro de Atención Múltiple (CAM) y podría incluirse en un aula o una sala de educación básica."
     ]
-    for b in est_list:
-        if st.checkbox(b, key=f"est_{b[:15]}"): bap_seleccionadas.append(f"{b} (Estructural)")
+    for i, b in enumerate(est_list):
+        if st.checkbox(b, key=f"est_{i}"): bap_seleccionadas.append(f"{b} (Estructural)")
 
 with tab2:
     st.write("**BARRERAS NORMATIVAS: Impedimento desde la Ley, norma, disposición política, etc.**")
@@ -101,8 +101,8 @@ with tab2:
         "Falta de un liderazgo compartido, colegiado, cooperativo.",
         "Canalización de NNAJ a centros paralelos de atención como única alternativa, no como complemento formativo y de desarrollo."
     ]
-    for b in nor_list:
-        if st.checkbox(b, key=f"nor_{b[:15]}"): bap_seleccionadas.append(f"{b} (Normativa)")
+    for i, b in enumerate(nor_list):
+        if st.checkbox(b, key=f"nor_{i}"): bap_seleccionadas.append(f"{b} (Normativa)")
 
 with tab3:
     st.write("**BARRERAS DIDÁCTICAS: Métodos de enseñanza y evaluación que no son acordes a las necesidades reales de NNAJ.**")
@@ -118,8 +118,8 @@ with tab3:
         "Desvinculación del trabajo de enseñanza y aprendizaje con madres padres de familia y tutores de NNAJ.",
         "Ausencia de recursos y/o apoyos tecnológicos como estrategia de enriquecimiento o una medida compensatoria."
     ]
-    for b in did_list:
-        if st.checkbox(b, key=f"did_{b[:15]}"): bap_seleccionadas.append(f"{b} (Didáctica)")
+    for i, b in enumerate(did_list):
+        if st.checkbox(b, key=f"did_{i}"): bap_seleccionadas.append(f"{b} (Didáctica)")
 
 with tab4:
     st.write("**BARRERAS ACTITUDINALES: Relacionadas con las interacciones y concepciones sociales respecto a la atención a la diversidad.**")
