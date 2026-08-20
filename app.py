@@ -1,17 +1,16 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
 from docx import Document
 from fpdf import FPDF
 import io
 from datetime import date
 
-# Configuración de la API
-genai.configure(api_key="AQ.Ab8RN6JM_YMzUguhKme19dTI9laFp2pEaKDzojA5eEQR6nqrRw")
-model = genai.GenerativeModel('gemini-1.5-flash')
+# Configuración con el nuevo SDK de Google GenAI
+client = genai.Client(api_key="AQ.Ab8RN6JM_YMzUguhKme19dTI9laFp2pEaKDzojA5eEQR6nqrRw")
 
 st.set_page_config(page_title="Instrumento de Registro BAP", page_icon="📝", layout="wide")
 
-# --- ESTILOS CSS PARA IMITAR EL PDF ---
+# Estilos CSS
 st.markdown("""
 <style>
     .caja-datos {
@@ -36,7 +35,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Funciones de exportación
 def generar_docx(texto_informe, alumno):
     doc = Document()
     doc.add_heading('Informe de Análisis BAP', 0)
@@ -57,10 +55,10 @@ def generar_pdf(texto_informe, alumno):
     pdf.multi_cell(0, 7, txt=texto_limpio)
     return bytes(pdf.output())
 
-# --- ENCABEZADO ---
+# Encabezado
 st.title("Instrumento de registro de las barreras para el aprendizaje y la participación")
 
-# --- DATOS GENERALES (Estilo PDF) ---
+# Datos Generales
 st.markdown('<div class="caja-datos">', unsafe_allow_html=True)
 st.markdown("<h4 style='text-align: center; color: #333;'>DATOS GENERALES</h4>", unsafe_allow_html=True)
 
@@ -78,16 +76,15 @@ nombre_docentes = st.text_area("Nombre y función de las y los docentes, agentes
 fecha_eval = st.date_input("Fecha:", value=date.today())
 st.markdown('</div>', unsafe_allow_html=True)
 
-# --- INSTRUCCIONES (Estilo PDF) ---
+# Instrucciones
 st.markdown("""
 <div class="caja-instrucciones">
     <p><strong>INSTRUCCIONES:</strong></p>
     <p>Después de revisar y analizar los diferentes insumos que se emplearon durante el proceso de diagnóstico socioeducativo, registren aquellas Barreras para el Aprendizaje y la Participación (BAP) que están enfrentando NNAJ. Identifiquen qué tipo de barrera es, la posible persona o agente educativo que la esté generando y el contexto en el cual se está presentando.</p>
-    <p>Es importante mencionar que las BAP son individuales, por lo que, si en su escuela tienen identificados NNAJ con alguna condición específica, será necesario que el instrumento se aplique de manera individual...</p>
 </div>
 """, unsafe_allow_html=True)
 
-# --- IDENTIFICACIÓN DE BARRERAS ---
+# Selección de BAP
 st.markdown("<h3 class='titulo-seccion'>Clasificación de Barreras</h3>", unsafe_allow_html=True)
 tab1, tab2, tab3, tab4 = st.tabs(["Estructurales", "Normativas", "Didácticas", "Actitudinales (Matriz)"])
 
@@ -116,8 +113,6 @@ with tab3:
 
 with tab4:
     st.write("**BARRERAS ACTITUDINALES: Relacionadas con las interacciones y concepciones sociales.**")
-    
-    # Matriz para imitar la tabla del PDF
     col_desc, col_aula, col_escuela, col_familia = st.columns([4, 1, 1, 1])
     col_desc.write("**Descripción de la Barrera**")
     col_aula.write("**AULA/SALA**")
@@ -140,31 +135,25 @@ with tab4:
 
 st.divider()
 
-# --- INTERPRETACIÓN Y GENERACIÓN ---
-st.markdown("<h3 class='titulo-seccion'>Interpretación general e Informe</h3>", unsafe_allow_html=True)
-with st.expander("Ver Guía de preguntas para redactar el informe de BAP"):
-    st.markdown("""
-    1. ¿En qué contextos están enfrentando BAP?
-    2. ¿Quiénes son las y/o los agentes educativos que están generando las BAP?
-    3. ¿Qué tipo de barreras son las que están enfrentando?
-    4. ¿Con cuáles debería empezar la intervención para minimizarlas?
-    5. ¿Necesitan un plan complementario para minimizarlas o eliminarlas?
-    """)
-
+# Generación de informe
 if st.button("Generar Informe Asistido por IA", type="primary"):
     if not bap_seleccionadas:
         st.warning("Selecciona al menos una BAP en las pestañas superiores.")
     else:
-        with st.spinner("Procesando análisis técnico basado en la guía oficial..."):
+        with st.spinner("Procesando análisis técnico con IA..."):
             prompt = f"""
             Redacta un informe formal de Educación Especial sobre las BAP.
             Centro: {centro_escolar}, Nivel: {nivel} {grado} {grupo}.
-            Docentes/Especialistas involucrados: {nombre_docentes}.
+            Docentes/Especialistas: {nombre_docentes}.
             Barreras detectadas: {', '.join(bap_seleccionadas)}.
-            Responde implícitamente a las preguntas de la guía oficial de BAP para sugerir intervenciones prácticas.
+            Estructura el informe respondiendo de forma técnica y práctica a la intervención socioeducativa.
             """
             try:
-                response = model.generate_content(prompt)
+                response = client.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=prompt
+                )
+                
                 st.success("Informe generado con éxito.")
                 
                 col_w, col_p = st.columns(2)
