@@ -5,7 +5,7 @@ from fpdf import FPDF
 import io
 from datetime import date
 
-# 1. Configuración de la API con tu clave válida
+# 1. Configuración de la API con tu clave de AI Studio
 client = genai.Client(api_key="AQ.Ab8RN6JM_YMzUguhKme19dTI9laFp2pEaKDzojA5eEQR6nqrRw")
 
 st.set_page_config(page_title="Instrumento de Registro BAP", page_icon="📝", layout="wide")
@@ -15,7 +15,8 @@ st.markdown("""
 <style>
     .caja-datos { background-color: #F6F1E9; border: 2px solid #C4A462; border-radius: 15px; padding: 25px; margin-bottom: 20px; color: #333333; }
     .caja-instrucciones { border: 2px solid #2B5B41; padding: 20px; margin-bottom: 20px; background-color: #ffffff; color: #333333; }
-    .titulo-seccion { color: #2B5B41; font-weight: bold; }
+    .titulo-seccion { color: #2B5B41; font-weight: bold; margin-top: 30px; margin-bottom: 15px;}
+    .stCheckbox { margin-bottom: -10px; } /* Ajusta el espacio entre checkboxes para que no sea tan largo */
 </style>
 """, unsafe_allow_html=True)
 
@@ -62,63 +63,113 @@ nombre_docentes = st.text_area("Nombre y función del equipo itinerante, docente
 fecha_eval = st.date_input("Fecha:", value=date.today())
 st.markdown('</div>', unsafe_allow_html=True)
 
-# --- CLASIFICACIÓN DE BARRERAS (Checkboxes) ---
+# --- CLASIFICACIÓN DE BARRERAS (Instrumento Fiel a la SEP) ---
 st.markdown("<h3 class='titulo-seccion'>1. Clasificación de Barreras</h3>", unsafe_allow_html=True)
-tab1, tab2, tab3, tab4 = st.tabs(["Estructurales", "Normativas", "Didácticas", "Actitudinales"])
+tab1, tab2, tab3, tab4 = st.tabs(["🏛️ Estructurales", "📜 Normativas", "📚 Didácticas", "🤝 Actitudinales"])
 
 bap_seleccionadas = []
 
 with tab1:
-    st.write("**Estructurales: Normalizan la exclusión**")
-    if st.checkbox("Falta de recursos humanos, materiales, apoyos, capacitación."): bap_seleccionadas.append("Falta de recursos o capacitación (Estructural)")
-    if st.checkbox("Infraestructura inadecuada (escolar o aula), falta de rampas, accesos."): bap_seleccionadas.append("Infraestructura inadecuada (Estructural)")
-    if st.checkbox("Invisibilizar e ignorar la presencia de NNAJ por su condición."): bap_seleccionadas.append("Invisibilización de NNAJ (Estructural)")
+    st.write("**BARRERAS ESTRUCTURALES: Normalizan la exclusión**")
+    est_list = [
+        "Negar la atención educativa por falta de recursos humanos, materiales, apoyos, capacitación, entre otras.",
+        "Priorizar una condición específica sobre otra por considerarla más importante para la atención.",
+        "Separación de NNAJ para su atención exclusiva o permanente en aulas especiales.",
+        "Negar la atención educativa por problemas de administración, vinculación y/o gestión del tiempo laboral.",
+        "Infraestructura inadecuada (escolar o en el aula), falta de rampas, accesos, adecuaciones arquitectónicas, señalamientos, entre otras.",
+        "Invisibilizar e ignorar la presencia de alguna o algún NNAJ por su condición (no identificación oportuna).",
+        "No incluir en el diagnóstico escolar la presencia de NNAJ asociado a una condición específica.",
+        "Medios de transporte insuficientes, inadecuados, inaccesibles, etc.",
+        "Cuando por su condición, alguna o algún NNAJ asiste a un Centro de Atención Múltiple (CAM) y podría incluirse en un aula o una sala de educación básica."
+    ]
+    for b in est_list:
+        if st.checkbox(b, key=f"est_{b[:15]}"): bap_seleccionadas.append(f"{b} (Estructural)")
 
 with tab2:
-    st.write("**Normativas: Impedimentos desde la Ley, norma o disposición.**")
-    if st.checkbox("Desconocimiento de los documentos normativos de inclusión."): bap_seleccionadas.append("Desconocimiento normativo (Normativa)")
-    if st.checkbox("Falta de un Programa Analítico contextualizado a la diversidad."): bap_seleccionadas.append("Falta de contextualización en el Programa Analítico (Normativa)")
-    if st.checkbox("Procesos de gestión excluyentes, descontextualizados, segregatorios."): bap_seleccionadas.append("Gestión excluyente (Normativa)")
+    st.write("**BARRERAS NORMATIVAS: Impedimento desde la Ley, norma, disposición política, etc.**")
+    nor_list = [
+        "Desconocimiento de los documentos normativos que regulan la atención educativa de la diversidad en el marco de la inclusión.",
+        "Omitir el cumplimiento, ejecución y difusión de los diferentes documentos normativos.",
+        "Falta de políticas compensatorias para el apoyo de la población asociada a una condición específica como becas, programas, recursos, entre otros.",
+        "Procesos de gestión excluyentes, descontextualizados, segregatorios, entre otros.",
+        "Organización incompleta del centro de trabajo escolar que dificulta la atención a la diversidad.",
+        "Falta de un proyecto escolar o del Centro, que incluya a toda la comunidad educativa independientemente de su condición.",
+        "Falta de un Programa Analítico que contextualice los Contenidos y Procesos de desarrollo de aprendizaje acordes a la diversidad de la población.",
+        "Desvinculación entre los Servicios de Educación Especial (SEE), las escuelas o Centros de Educación Básica, los especialistas, los niveles educativos, el campo laboral, etc.",
+        "Falta de mecanismos de formación, profesionalización docente, actualización y/o acompañamiento pedagógico.",
+        "Rigidez administrativa, burocrática, morosa, entre otras.",
+        "Falta de un liderazgo compartido, colegiado, cooperativo.",
+        "Canalización de NNAJ a centros paralelos de atención como única alternativa, no como complemento formativo y de desarrollo."
+    ]
+    for b in nor_list:
+        if st.checkbox(b, key=f"nor_{b[:15]}"): bap_seleccionadas.append(f"{b} (Normativa)")
 
 with tab3:
-    st.write("**Didácticas: Métodos de enseñanza y evaluación no acordes.**")
-    if st.checkbox("Práctica docente homogeneizada sin considerar la diversidad."): bap_seleccionadas.append("Práctica homogeneizada (Didáctica)")
-    if st.checkbox("Ausencia de Ajustes Razonables (AR) acordes a la condición."): bap_seleccionadas.append("Ausencia de Ajustes Razonables (Didáctica)")
-    if st.checkbox("Mecanismos de evaluación homogéneos sin considerar capacidades."): bap_seleccionadas.append("Evaluación homogénea (Didáctica)")
+    st.write("**BARRERAS DIDÁCTICAS: Métodos de enseñanza y evaluación que no son acordes a las necesidades reales de NNAJ.**")
+    did_list = [
+        "Práctica docente homogeneizada sin considerar la diversidad y las necesidades específicas de cada condición.",
+        "No diversificar la práctica docente y la planeación didáctica conforme a los Principios del Diseño Universal para el Aprendizaje (DUA).",
+        "Mecanismos de evaluación homogéneos sin considerar la diversidad de NNAJ, sus capacidades y/o necesidades.",
+        "Ausencia de Ajustes Razonables (AR) acordes a las necesidades específicas asociadas a la condición (cuando se requieran).",
+        "Desconocimiento del qué, para qué, cómo y cuándo enseñar y/o evaluar.",
+        "Estandarización de los aprendizajes como punto de partida para la intervención y para la evaluación.",
+        "Priorizar el trabajo individualizado sobre el trabajo cooperativo y colaborativo dentro del aula.",
+        "Desvinculación del trabajo de enseñanza y aprendizaje entre docentes de educación básica, y el personal de los equipos de apoyo de educación especial.",
+        "Desvinculación del trabajo de enseñanza y aprendizaje con madres padres de familia y tutores de NNAJ.",
+        "Ausencia de recursos y/o apoyos tecnológicos como estrategia de enriquecimiento o una medida compensatoria."
+    ]
+    for b in did_list:
+        if st.checkbox(b, key=f"did_{b[:15]}"): bap_seleccionadas.append(f"{b} (Didáctica)")
 
 with tab4:
-    st.write("**Actitudinales: Relacionadas con interacciones y concepciones sociales.**")
+    st.write("**BARRERAS ACTITUDINALES: Relacionadas con las interacciones y concepciones sociales respecto a la atención a la diversidad.**")
     c_desc, c_aula, c_esc, c_fam = st.columns([4, 1, 1, 1])
-    c_desc.write("**Condición observada**"); c_aula.write("**AULA**"); c_esc.write("**ESCUELA**"); c_fam.write("**FAMILIA**")
+    c_desc.write("**Condición observada**"); c_aula.write("**AULA/SALA**"); c_esc.write("**ESCUELA/CENTRO**"); c_fam.write("**FAMILIA**")
     
-    actitudinales = ["Apatía, rechazo o indiferencia.", "Sobreprotección.", "Bajas expectativas sobre su aprendizaje.", "Acoso y/o bullying."]
-    for barrera in actitudinales:
+    act_list = [
+        "Apatía, rechazo o indiferencia hacia las condiciones específicas.",
+        "Segregación y/o exclusión en los procesos de inclusión.",
+        "Sobreprotección.",
+        "Altas expectativas sobre su desarrollo y aprendizaje.",
+        "Bajas expectativas sobre su desarrollo y aprendizaje.",
+        "Desconocimiento ante las condiciones específicas que tienen NNAJ.",
+        "Acoso y/o bullying en el entorno.",
+        "Estereotipos erróneos y/o prejuicios ante las condiciones.",
+        "Etiquetas sobre las condiciones que se tienen.",
+        "Clasismo y/o racismo generado por la condición personal, social, económica, física o cultural.",
+        "Exclusión por rendimiento escolar, desempeño, desarrollo, entre otras.",
+        "Abuso físico y/o emocional generado por su condición.",
+        "Poco aprecio por la educación o el desarrollo de NNAJ.",
+        "Discriminación por género, ideología, creencias, o alguna otra."
+    ]
+    for i, barrera in enumerate(act_list):
         c1, c2, c3, c4 = st.columns([4, 1, 1, 1])
         c1.write(f"• {barrera}")
-        if c2.checkbox(" ", key=f"a_{barrera}"): bap_seleccionadas.append(f"{barrera} (Aula)")
-        if c3.checkbox(" ", key=f"e_{barrera}"): bap_seleccionadas.append(f"{barrera} (Escuela)")
-        if c4.checkbox(" ", key=f"f_{barrera}"): bap_seleccionadas.append(f"{barrera} (Familia)")
+        if c2.checkbox(" ", key=f"a_{i}"): bap_seleccionadas.append(f"{barrera} (Actitudinal - Aula)")
+        if c3.checkbox(" ", key=f"e_{i}"): bap_seleccionadas.append(f"{barrera} (Actitudinal - Escuela)")
+        if c4.checkbox(" ", key=f"f_{i}"): bap_seleccionadas.append(f"{barrera} (Actitudinal - Familia)")
 
 st.divider()
 
 # --- MÓDULO DE INTERPRETACIÓN CUALITATIVA ---
-st.markdown("<h3 class='titulo-seccion'>2. Interpretación y Estrategias (Preguntas Guía)</h3>", unsafe_allow_html=True)
-st.info("💡 Responde brevemente lo que aplique. El modelo de Inteligencia Artificial procesará estas ideas para redactar un informe profesional.")
+st.markdown("<h3 class='titulo-seccion'>2. Interpretación y Estrategias (Guía Oficial)</h3>", unsafe_allow_html=True)
+st.info("💡 Completa los apartados necesarios para orientar el plan de acción. La Inteligencia Artificial articulará tus respuestas con las barreras seleccionadas para generar el borrador.")
 
 with st.expander("Desplegar formulario de análisis cualitativo", expanded=True):
     col_preg1, col_preg2 = st.columns(2)
     
     with col_preg1:
         q1 = st.text_input("1. ¿En qué contextos están enfrentando BAP?")
-        q2 = st.text_input("2. ¿Quiénes son los agentes que las están generando?")
-        q4 = st.text_input("4. Priorización: ¿Con cuáles BAP empezar la intervención?")
-        q5 = st.text_area("5. ¿Se minimizan desde el aula o necesitan plan complementario?")
+        q2 = st.text_input("2. ¿Quiénes son las y/o los agentes educativos que están generando las BAP?")
+        q3 = st.text_area("3. ¿Qué tipo de barreras son las que están enfrentando, acorde a la clasificación?")
+        q4 = st.text_input("4. Si fuera necesario priorizar ¿con cuáles debería empezar la intervención?")
+        q5 = st.text_area("5. ¿Pueden ser minimizadas desde el aula o necesitan un plan complementario?")
         
     with col_preg2:
-        q6 = st.text_area("6. ¿Cuáles son las posibles estrategias a realizar?")
-        q7 = st.text_input("7. Responsabilidades de cada integrante del colectivo:")
+        q6 = st.text_area("6. ¿Cuáles son las posibles estrategias que se deben realizar?")
+        q7 = st.text_input("7. ¿Cuáles serán las responsabilidades de cada integrante del colectivo?")
         q8 = st.text_input("8. ¿En qué plazo se realizarán las acciones?")
-        q9 = st.text_input("9. ¿Cómo aportarán estas acciones a la inclusión?")
+        q9 = st.text_area("9. ¿Cómo aportarán estas acciones a los retos en pro de la inclusión?")
     
     q10 = st.text_area("10. Cualquier otro dato que aporte a la interpretación y establecimiento de acciones:")
 
@@ -127,54 +178,53 @@ st.divider()
 # --- GENERACIÓN DE INFORME IA ---
 if st.button("✨ Generar Informe Potenciado por IA", type="primary"):
     if not bap_seleccionadas and not q1:
-        st.warning("Selecciona al menos una barrera o responde alguna pregunta de la guía antes de generar.")
+        st.warning("Selecciona al menos una barrera o responde alguna pregunta de la guía antes de generar el documento.")
     else:
-        with st.spinner("Procesando análisis técnico con base en las respuestas del docente..."):
+        with st.spinner("Procesando análisis técnico y estructurando el informe final..."):
             
-            # Construcción del prompt uniendo los checkboxes con el análisis del especialista
             prompt = f"""
-            Actúa como un experto en Educación Especial y redacta el "Informe de las BAP que enfrentan niñas, niños, adolescentes y jóvenes".
+            Actúa como un especialista en Educación Especial, redactando el "Informe de las BAP que enfrentan niñas, niños, adolescentes y jóvenes".
             
             DATOS DE IDENTIFICACIÓN:
-            Alumno: {nombre_alumno} ({nivel} {grado} {grupo}, {centro_escolar})
-            Equipo a cargo: {nombre_docentes}
+            Alumno: {nombre_alumno} ({nivel} {grado} {grupo}, {centro_escolar}, Subsistema: {subsistema}, Turno: {turno})
+            Equipo o docentes a cargo: {nombre_docentes}
             
-            1. BARRERAS DETECTADAS (Checkboxes):
-            {', '.join(bap_seleccionadas) if bap_seleccionadas else 'No se marcaron casillas específicas.'}
+            1. BARRERAS DETECTADAS (Acorde a la normatividad):
+            {', '.join(bap_seleccionadas) if bap_seleccionadas else 'No se marcaron casillas específicas, analizar cualitativamente.'}
             
-            2. ANÁLISIS CUALITATIVO DEL DOCENTE (Usa esta información como la base central de la propuesta estratégica):
-            - Contextos: {q1}
-            - Personas que generan BAP: {q2}
-            - Priorización de intervención: {q4}
-            - Alcance (Aula vs Complementario): {q5}
+            2. ANÁLISIS CUALITATIVO Y ESTRATÉGICO DEL DOCENTE:
+            - Contextos de las BAP: {q1}
+            - Agentes generadores: {q2}
+            - Tipos de barreras priorizadas: {q3}
+            - Prioridad de intervención: {q4}
+            - Alcance (Aula o plan complementario): {q5}
             - Estrategias propuestas: {q6}
             - Responsabilidades del colectivo: {q7}
             - Plazos de acción: {q8}
             - Aportación a la inclusión: {q9}
             - Datos extra relevantes: {q10}
             
-            REGLAS DE REDACCIÓN:
-            Integra ambos apartados en un documento narrativo, profesional, formal y pedagógico, sin que parezca un formato de preguntas y respuestas. Usa títulos y viñetas para estructurar el plan de intervención. Si alguna pregunta cualitativa quedó vacía, no la menciones, deduce la estrategia con base en las barreras marcadas.
+            REGLAS DE REDACCIÓN Y ESTRUCTURA:
+            No generes un documento de formato "Pregunta/Respuesta". Redacta un informe narrativo formal, profesional y cohesionado, dividido por secciones claras (Introducción, Barreras Identificadas, Estrategias de Intervención, Responsabilidades y Plazos). Integra armónicamente las casillas marcadas con el texto abierto escrito por el docente. Omite cualquier variable o pregunta que el docente haya dejado en blanco, llenando el vacío lógico de forma técnica y pedagógica.
             """
             
             try:
-                # Modifica el nombre del modelo (gemini-3.6-flash / gemini-1.5-flash) según la versión activa de tu API
                 response = client.models.generate_content(
                     model="gemini-3.6-flash", 
                     contents=prompt
                 )
                 
-                st.success("¡Informe técnico redactado con éxito!")
+                st.success("¡Documento maestro generado con éxito!")
                 
                 col_w, col_p = st.columns(2)
                 with col_w:
                     docx_file = generar_docx(response.text, nombre_alumno)
-                    st.download_button("📄 Descargar Word", data=docx_file, file_name=f"Informe_BAP_{nombre_alumno}.docx")
+                    st.download_button("📄 Descargar Archivo Editable (Word)", data=docx_file, file_name=f"Informe_BAP_{nombre_alumno}.docx")
                 with col_p:
                     pdf_file = generar_pdf(response.text, nombre_alumno)
-                    st.download_button("📕 Descargar PDF", data=pdf_file, file_name=f"Informe_BAP_{nombre_alumno}.pdf")
+                    st.download_button("📕 Descargar PDF Final", data=pdf_file, file_name=f"Informe_BAP_{nombre_alumno}.pdf")
                 
-                with st.expander("Ver borrador del informe", expanded=True):
+                with st.expander("Ver borrador del informe generado", expanded=True):
                     st.write(response.text)
                     
             except Exception as e:
