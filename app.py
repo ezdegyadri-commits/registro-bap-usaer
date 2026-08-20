@@ -7,7 +7,7 @@ from datetime import date
 
 # Configuración de la API
 genai.configure(api_key="AQ.Ab8RN6JM_YMzUguhKme19dTI9laFp2pEaKDzojA5eEQR6nqrRw")
-model = genai.GenerativeModel('gemini-pro')
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 st.set_page_config(page_title="Instrumento de Registro BAP", page_icon="📝", layout="wide")
 
