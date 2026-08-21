@@ -5,7 +5,7 @@ from fpdf import FPDF
 import io
 from datetime import date
 
-# 1. Configuración de la API con tu clave de AI Studio
+# 1. Configuración de la API (Pega tu clave AIzaSy...)
 client = genai.Client(api_key="AQ.Ab8RN6JM_YMzUguhKme19dTI9laFp2pEaKDzojA5eEQR6nqrRw")
 
 st.set_page_config(page_title="Instrumento de Registro BAP", page_icon="📝", layout="wide")
@@ -16,7 +16,8 @@ st.markdown("""
     .caja-datos { background-color: #F6F1E9; border: 2px solid #C4A462; border-radius: 15px; padding: 25px; margin-bottom: 20px; color: #333333; }
     .caja-instrucciones { border: 2px solid #2B5B41; padding: 20px; margin-bottom: 20px; background-color: #ffffff; color: #333333; }
     .titulo-seccion { color: #2B5B41; font-weight: bold; margin-top: 30px; margin-bottom: 15px;}
-    .stCheckbox { margin-bottom: -10px; } /* Ajusta el espacio entre checkboxes para que no sea tan largo */
+    .stCheckbox { margin-bottom: -10px; } 
+    hr.separador-movil { border: 0; border-top: 1px solid #e0e0e0; margin: 15px 0; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -50,12 +51,12 @@ st.markdown("<h4 style='text-align: center; color: #333;'>DATOS GENERALES</h4>",
 
 col1, col2, col3 = st.columns(3)
 centro_escolar = col1.text_input("Centro Escolar:")
-subsistema = col2.text_input("Subsistema:")
-turno = col3.text_input("Turno:")
+subsistema = col2.selectbox("Subsistema:", ["Estatal", "Federal"])
+turno = col3.selectbox("Turno:", ["Matutino", "Vespertino"])
 
 col4, col5 = st.columns(2)
-grado = col4.text_input("Grado:")
-grupo = col5.text_input("Grupo:")
+grado = col4.selectbox("Grado:", ["1°", "2°", "3°", "4°", "5°", "6°"])
+grupo = col5.selectbox("Grupo:", ["A", "B", "C"])
 
 nivel = st.radio("Nivel:", ["Inicial", "Preescolar", "Primaria", "Secundaria", "Laboral"], horizontal=True)
 nombre_alumno = st.text_input("Nombre de la o el estudiante (NNAJ):")
@@ -63,7 +64,7 @@ nombre_docentes = st.text_area("Nombre y función del equipo itinerante, docente
 fecha_eval = st.date_input("Fecha:", value=date.today())
 st.markdown('</div>', unsafe_allow_html=True)
 
-# --- CLASIFICACIÓN DE BARRERAS (Instrumento Fiel a la SEP) ---
+# --- CLASIFICACIÓN DE BARRERAS ---
 st.markdown("<h3 class='titulo-seccion'>1. Clasificación de Barreras</h3>", unsafe_allow_html=True)
 tab1, tab2, tab3, tab4 = st.tabs(["🏛️ Estructurales", "📜 Normativas", "📚 Didácticas", "🤝 Actitudinales"])
 
@@ -122,9 +123,8 @@ with tab3:
         if st.checkbox(b, key=f"did_{i}"): bap_seleccionadas.append(f"{b} (Didáctica)")
 
 with tab4:
-    st.write("**BARRERAS ACTITUDINALES: Relacionadas con las interacciones y concepciones sociales respecto a la atención a la diversidad.**")
-    c_desc, c_aula, c_esc, c_fam = st.columns([4, 1, 1, 1])
-    c_desc.write("**Condición observada**"); c_aula.write("**AULA/SALA**"); c_esc.write("**ESCUELA/CENTRO**"); c_fam.write("**FAMILIA**")
+    st.write("**BARRERAS ACTITUDINALES: Relacionadas con las interacciones y concepciones sociales.**")
+    st.info("📱 Selecciona los contextos en los que se hace evidente cada barrera.")
     
     act_list = [
         "Apatía, rechazo o indiferencia hacia las condiciones específicas.",
@@ -142,12 +142,15 @@ with tab4:
         "Poco aprecio por la educación o el desarrollo de NNAJ.",
         "Discriminación por género, ideología, creencias, o alguna otra."
     ]
+    
+    # Diseño Optimizado para Teléfonos Móviles
     for i, barrera in enumerate(act_list):
-        c1, c2, c3, c4 = st.columns([4, 1, 1, 1])
-        c1.write(f"• {barrera}")
-        if c2.checkbox(" ", key=f"a_{i}"): bap_seleccionadas.append(f"{barrera} (Actitudinal - Aula)")
-        if c3.checkbox(" ", key=f"e_{i}"): bap_seleccionadas.append(f"{barrera} (Actitudinal - Escuela)")
-        if c4.checkbox(" ", key=f"f_{i}"): bap_seleccionadas.append(f"{barrera} (Actitudinal - Familia)")
+        st.markdown(f"**{i+1}. {barrera}**")
+        c1, c2, c3 = st.columns(3)
+        if c1.checkbox("🏫 Aula/Sala", key=f"a_{i}"): bap_seleccionadas.append(f"{barrera} (Actitudinal - Aula)")
+        if c2.checkbox("🏢 Escuela/Centro", key=f"e_{i}"): bap_seleccionadas.append(f"{barrera} (Actitudinal - Escuela)")
+        if c3.checkbox("👨‍👩‍👧 Familia", key=f"f_{i}"): bap_seleccionadas.append(f"{barrera} (Actitudinal - Familia)")
+        st.markdown("<hr class='separador-movil'>", unsafe_allow_html=True)
 
 st.divider()
 
